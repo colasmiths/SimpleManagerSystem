@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demo.cgb.pj.sys.dao.SysDeptDao">
+
+    <select id="findById" resultType="com.demo.cgb.pj.sys.entity.SysDept">
+        select * from sys_depts where id=#{id}
+    </select>
+
+
+    <update id="updateObject" parameterType="com.demo.cgb.pj.sys.entity.SysDept">
+        update sys_dept set name=#{name},sort=#{sort},
+        note=#{note},parentId=#{parentId},
+        modifiedUser=#{modifiedUser},modifiedTime=now()
+        where id=#{id}
+    </update>
+
+
+    <insert id="insertObject" parameterType="com.demo.cgb.pj.sys.entity.SysDept">
+        insert into sys_depts(id,name,parentId,sort,note,createdTime,createdUser,modifiedTime,modifiedUser)values(
+        #{id},#{name},#{parentId},#{sort},#{note},now(),#{createdUser},now(),#{modifiedUser})
+    </insert>
+
+    <select id="findZTreeNodes" resultType="com.demo.cgb.pj.common.vo.Node">
+        select id,name,parentId from sys_depts
+    </select>
+
+    <select id="getChildCount" parameterType="int">
+        select count(*) from sys_depts where parentId=#{id}
+    </select>
+
+    <delete id="deleteObject" parameterType="int">
+        delete from sys_depts where id=#{id}
+    </delete>
+
+
+    <select id="findObjects" resultType="map">
+        select sd_c.*,(select name from sys_depts sd_p where sd_c.parentId=sd_p.id) parentName from sys_depts sd_c
+    </select>
+
+
+
+
+</mapper>

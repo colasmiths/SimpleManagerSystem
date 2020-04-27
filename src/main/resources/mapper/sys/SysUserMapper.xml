@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demo.cgb.pj.sys.dao.SysUserDao">
+
+
+    <sql id="fuzzyqueryByUsername">
+        <where>
+            <if test="username!=null and username!=''">
+                username like concat("%",#{username},"%")
+            </if>
+        </where>
+    </sql>
+
+    <insert id="insertObject" parameterType="com.demo.cgb.pj.sys.entity.SysUser">
+        <selectKey keyProperty="id" resultType="int" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        /*selectKey一般用户获取id主键值,order属性表示获取的主键值是在insert之前还是之后，然后用last_insert_id()获取id值*/
+        insert into sys_users (username,password,deptId,email,moblie,salt,valid,createdIime,modifiedTime,createdUser,modifiedUser)
+        values(#{username},#{password},#{deptId},#{email},#{mobile},#{salt},#{valid},now(),now(),#{modifiedTime},#{createdUser},#{modifiedUser})
+
+    </insert>
+
+    <update id="updateObject" parameterType="com.demo.cgb.pj.sys.entity.SysUser">
+        update sys_users
+        <set>
+            <if test="username!=null and username!=''">
+                username=#{username},
+            </if>
+            <if test="email!=null and email!=''">
+                email=#{email},
+            </if>
+            <if test="mobile!=null and mobile!=''">
+                mobile=#{mobile},
+            </if>
+            <if test="deptId!=null and deptId!=''">
+                deptId=#{deptId},
+            </if>
+            <if test="modifiedUser!=null and modifiedUser!=''">
+                modifiedUser=#{modifiedUser},
+            </if>
+            modifiedTime=now()
+        </set>
+        where id=#{id}
+    </update>
+
+    <!--根据查询sys_users的结果统计记录总数-->
+    <select id="getRowCount" resultType="int">
+        select count(*) from sys_users
+        <include refid="fuzzyqueryByUsername"></include>
+    </select>
+
+
+    <!--用-->
+    <resultMap id="sysUserDeptVo" type="com.demo.cgb.pj.sys.vo.SysUserDeptVo">
+        <association property="sysDept" column="deptId" select="com.demo.cgb.pj.sys.dao.SysDeptDao.findById"></association>
+    </resultMap>
+
+    <!--查询当前页数据-->
+    <select id="findPageObjects" resultMap="sysUserDeptVo">
+        select * from sys_users
+        <include refid="fuzzyqueryByUsername"></include>
+        order by createdTime desc
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <select id="findObjectById" resultMap="sysUserDeptVo">
+        select * from sys_user where id=#{id};
+    </select>
+
+
+</mapper>
