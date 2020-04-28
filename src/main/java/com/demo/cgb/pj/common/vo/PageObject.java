@@ -1,8 +1,11 @@
 package com.demo.cgb.pj.common.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
 
+@Data
 public class PageObject<T> implements Serializable {
     private static final long serialVersionUID = 2352271705547032307L;
 
@@ -13,7 +16,7 @@ public class PageObject<T> implements Serializable {
     private Integer rowCount = 0;
     //计算获得的总页数
     private Integer pageCount = 0;
-    //当前页的记录
+    //当前页的记录?
     private List<T> records;
 
 }

@@ -1,6 +1,8 @@
 package com.demo.cgb.pj.sys.service;
 
+import com.demo.cgb.pj.common.annotation.RequiredLog;
 import com.demo.cgb.pj.common.exceptions.ServiceException;
+import com.demo.cgb.pj.common.util.PageUtil;
 import com.demo.cgb.pj.common.vo.PageObject;
 import com.demo.cgb.pj.sys.dao.SysUserDao;
 import com.demo.cgb.pj.sys.dao.SysUserRoleDao;
@@ -79,17 +81,42 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    @RequiresPermissions("sys:user:valid")
+    @RequiresPermissions("sys:user:valid")//此注解暂未知其含义
     /**
      * 当添加@RequiresPermissions注解时，
      * 此方法需要进行权限控制(授权以后才可以访问)
      */
     public int validById(Integer id, Integer valid, String modifiedUser) {
-        return 0;
+        if(id==null||id<1)
+            throw new ServiceException("id值不正确");
+        if(valid!=1||valid!=0)
+            throw new ServiceException("用户状态值不正确");
+
+        int rows = sysUserDao.validById(id,valid,modifiedUser);
+        if(rows==0)
+            throw new ServiceException("此用户可能已经不存在");
+        return rows;
+
     }
 
     @Override
+    @Transactional(readOnly = false)
+    @RequiredLog("query user")//此注解暂时未知其含义
     public PageObject<SysUserDeptVo> findPageObjects(String username, Integer pageCurrent) {
-        return null;
+        if(pageCurrent==null||pageCurrent<1)
+            throw new IllegalArgumentException("页码不正确");
+
+        int rowCount=sysUserDao.getRowCount(username);
+        if(rowCount==0)
+            throw new ServiceException("用户不存在");
+
+        int pageSize = PageUtil.getPageSize();
+
+        int startIndex = PageUtil.getStartIndex(pageCurrent);
+
+        List<SysUserDeptVo> records = sysUserDao.findPageObjects(username,startIndex,pageSize);
+
+
+        return PageUtil.newPageObject(pageCurrent,rowCount,pageSize,records);
     }
 }
