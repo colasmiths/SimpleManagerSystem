@@ -7,13 +7,15 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Mapper
 public interface SysUserDao {
 
-    //根据用户名查询用户信息
+    //根据用户名查询用户信息,此方法用于realm中
     @Select("select * from sys_users where username = #{username}")
     SysUser findUserByUserName(String Name);
 
@@ -31,7 +33,7 @@ public interface SysUserDao {
 
     int updateObject(SysUser entity);
 
-    int getRowCount(@Param("username") String username);
+    int getRowCount(@Param("username") String username); //需要通过username来查出记录行数，后面在通过行数来计算页面数
 
     List<SysUserDeptVo> findPageObjects(@Param("username")String username,@Param("startIndex")Integer satrtIndex,@Param("pageSize")Integer pageSize);
 

@@ -1,6 +1,7 @@
 package com.demo.cgb.pj.sys.entity;
 
 import lombok.Data;
+import org.springframework.context.annotation.Bean;
 
 import java.io.Serializable;
 import java.util.Date;

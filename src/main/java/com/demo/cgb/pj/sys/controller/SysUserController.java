@@ -7,11 +7,15 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
 
+
+@Controller
+@RequestMapping("/user/")
 public class SysUserController {
     @Autowired
     private SysUserService sysUserService;
@@ -27,7 +31,7 @@ public class SysUserController {
         return "sys/user_edit";
     }
 
-    //此处需要掌握shiro，日后处理
+    //
     @RequestMapping("doLogin")
     @ResponseBody
     public JsonResult doLogin(String username, String password){
@@ -62,10 +66,22 @@ public class SysUserController {
     }
 
 
+    @RequestMapping("doFindObjectById")
+    @ResponseBody
     public JsonResult doFindObjectById(Integer id){
         Map<String,Object> map = sysUserService.findObjectById(id);
         return new JsonResult(map);
     }
+
+
+    @RequestMapping("doUpdateObject")
+    @ResponseBody
+    public JsonResult doUpdateObject(SysUser entity,Integer[] roleIds){
+        sysUserService.updateObject(entity,roleIds);
+        return new JsonResult("update成功");
+    }
+
+
 
 
 

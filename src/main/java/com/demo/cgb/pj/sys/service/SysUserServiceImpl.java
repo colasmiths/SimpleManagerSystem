@@ -11,26 +11,41 @@ import com.demo.cgb.pj.sys.vo.SysUserDeptVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Service
 public class SysUserServiceImpl implements SysUserService {
 
-    @Autowired
+    @Resource
     private SysUserDao sysUserDao;
 
+    @Resource
     private SysUserRoleDao sysUserRoleDao;
 
 
     @Override
     public int updateObject(SysUser entity, Integer[] roleIds) {
-        return 0;
+        if(entity==null)
+            throw new IllegalArgumentException("请提交一个有效用户");
+        if(StringUtils.isEmpty(entity.getUsername()))
+            throw new ServiceException("此用户必须要有用户名");
+        if(roleIds==null||roleIds.length==0)
+            throw new IllegalArgumentException("此用户必须被定义身份");
+        int rows = sysUserDao.updateObject(entity);
+
+        sysUserRoleDao.deleteObjectsByUserId(entity.getId());
+        sysUserRoleDao.insertObjects(entity.getId(),roleIds);
+
+        return rows;
     }
 
     @Override
